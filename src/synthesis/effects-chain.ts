@@ -79,7 +79,8 @@ export class EffectsChain {
     this.effects.set('eq3', { id: 'eq3', node: this.eq3, enabled: false });
 
     // BitCrusher
-    this.bitcrusher = new Tone.BitCrusher({ bits: 8, wet: 0 });
+    this.bitcrusher = new Tone.BitCrusher(8);
+    this.bitcrusher.wet.value = 0;
     this.effects.set('bitcrusher', { id: 'bitcrusher', node: this.bitcrusher, enabled: false });
 
     // Distortion
@@ -230,7 +231,7 @@ export class EffectsChain {
       case 'distortion':
         return { amount: this.distortion.distortion, wet: this.distortion.wet.value, enabled: effect.enabled } as DistortionParams;
       case 'autowah':
-        return { baseFrequency: this.autowah.baseFrequency, octaves: this.autowah.octaves, sensitivity: this.autowah.sensitivity.value, wet: this.autowah.wet.value, enabled: effect.enabled } as AutoWahParams;
+        return { baseFrequency: this.autowah.baseFrequency, octaves: this.autowah.octaves, sensitivity: this.autowah.sensitivity, wet: this.autowah.wet.value, enabled: effect.enabled } as AutoWahParams;
       case 'autofilter':
         return { frequency: this.autofilter.frequency.value, depth: this.autofilter.depth.value, octaves: this.autofilter.octaves, wet: this.autofilter.wet.value, enabled: effect.enabled } as AutoFilterParams;
       case 'phaser':
@@ -320,7 +321,7 @@ export class EffectsChain {
     const effect = this.effects.get('autowah')!;
     if (params.baseFrequency !== undefined) this.autowah.baseFrequency = params.baseFrequency;
     if (params.octaves !== undefined) this.autowah.octaves = params.octaves;
-    if (params.sensitivity !== undefined) this.autowah.sensitivity.value = params.sensitivity;
+    if (params.sensitivity !== undefined) this.autowah.sensitivity = params.sensitivity;
     if (params.wet !== undefined && effect.enabled) this.autowah.wet.value = params.wet;
     if (params.enabled !== undefined) {
       this.setEnabled('autowah', params.enabled);

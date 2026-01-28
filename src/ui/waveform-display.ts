@@ -349,7 +349,6 @@ export class WaveformDisplay {
   private drawWaveform(ctx: CanvasRenderingContext2D, width: number, height: number): void {
     if (!this.currentData?.wavetable) return;
 
-    const padding = 20;
     const path = this.getWaveformPath(width, height);
     const gradient = this.getWaveformGradient(ctx, height);
     

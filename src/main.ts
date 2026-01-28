@@ -71,7 +71,8 @@ async function init(): Promise<void> {
  */
 async function loadSampleData(): Promise<void> {
   try {
-    const response = await fetch('/sample-data/sample-glucose.csv');
+    // Use import.meta.env.BASE_URL for correct path on GitHub Pages
+    const response = await fetch(`${import.meta.env.BASE_URL}sample-data/sample-glucose.csv`);
     if (!response.ok) {
       console.warn('Sample data not found');
       return;
@@ -146,7 +147,8 @@ function setupFileLoader(): void {
 
     appContainer.addEventListener('dragleave', (e) => {
       // Only remove if leaving the container entirely
-      if (!appContainer.contains(e.relatedTarget as Node)) {
+      const dragEvent = e as DragEvent;
+      if (!appContainer.contains(dragEvent.relatedTarget as Node)) {
         fileLoaderBtn.classList.remove('drag-over');
       }
     });

@@ -23,7 +23,6 @@ export class OscillatorMixer {
   private waveformPreview: HTMLElement | null = null;
   private previewCanvas: HTMLCanvasElement | null = null;
   private previewCtx: CanvasRenderingContext2D | null = null;
-  private currentHoverIndex: number = -1;
   
   // Dropdown state
   private openDropdownIndex: number = -1;
@@ -213,8 +212,6 @@ export class OscillatorMixer {
     const dayData = this.data.days.get(date);
     if (!dayData?.wavetable) return;
     
-    this.currentHoverIndex = oscIndex;
-    
     // Update preview content
     const dateLabel = this.waveformPreview.querySelector('.preview-date');
     const statsLabel = this.waveformPreview.querySelector('.preview-stats');
@@ -230,8 +227,8 @@ export class OscillatorMixer {
     }
     
     if (statsLabel && dayData.stats) {
-      const inRange = Math.round(dayData.stats.inRangePercentage);
-      statsLabel.textContent = `↓${Math.round(dayData.stats.min)} µ${Math.round(dayData.stats.mean)} ↑${Math.round(dayData.stats.max)} | ${inRange}%`;
+      const inRange = Math.round(dayData.stats.timeInRange);
+      statsLabel.textContent = `↓${Math.round(dayData.stats.min)} µ${Math.round(dayData.stats.avg)} ↑${Math.round(dayData.stats.max)} | ${inRange}%`;
     }
     
     // Append to container if not already
@@ -257,7 +254,6 @@ export class OscillatorMixer {
    * Hide the waveform preview
    */
   private hideWaveformPreview(): void {
-    this.currentHoverIndex = -1;
     this.waveformPreview?.classList.remove('active');
   }
   
