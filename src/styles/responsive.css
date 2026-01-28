@@ -1,0 +1,125 @@
+/* Glukoscillator - Responsive Styles */
+
+/* =====================================================
+   RESPONSIVE ADJUSTMENTS
+   ===================================================== */
+@media (max-width: 1200px) {
+  .adsr-controls { gap: var(--spacing-md); }
+  .effects-pedalboard { flex-wrap: wrap; }
+}
+
+@media (max-width: 900px) {
+  .main-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .day-selector {
+    max-height: 180px;
+    order: -1;
+  }
+  
+  .day-list {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  
+  .day-item {
+    flex-shrink: 0;
+    width: 150px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .controls-row {
+    flex-direction: column;
+  }
+  
+  .controls-faceplate {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .piano-keyboard {
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 600px) {
+  .app-container {
+    padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+  
+  .logo-text {
+    font-size: 1.2rem;
+  }
+  
+  .oscillator-slots {
+    grid-template-columns: 1fr;
+  }
+  
+  .oscillator-slot {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .adsr-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .piano-keyboard {
+    height: 120px;
+  }
+  
+  .white-key {
+    width: 36px;
+    height: 110px;
+  }
+  
+  .black-key {
+    width: 24px;
+    height: 70px;
+    margin-left: -12px;
+    margin-right: -12px;
+  }
+  
+  .effect-module {
+    width: 120px;
+  }
+}
+
+@media (pointer: coarse) {
+  .piano-key {
+    min-width: 40px;
+  }
+  
+  .knob {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .mini-knob {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .mini-knob-container {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .footswitch {
+    width: 44px;
+    height: 44px;
+  }
+}
+

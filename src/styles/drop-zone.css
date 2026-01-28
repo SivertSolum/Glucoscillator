@@ -1,0 +1,90 @@
+/* Glukoscillator - Drop Zone Styles */
+
+/* =====================================================
+   DROP ZONE - Cartridge Slot Style
+   ===================================================== */
+.drop-zone {
+  background: linear-gradient(180deg, #0a0908 0%, #151210 100%);
+  border: 3px solid var(--metal-dark);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 100px;
+  position: relative;
+  box-shadow: 
+    inset 0 4px 20px rgba(0, 0, 0, 0.5),
+    0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.drop-zone::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 2px dashed rgba(232, 168, 124, 0.2);
+  border-radius: var(--radius-md);
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.drop-zone:hover::before,
+.drop-zone.drag-over::before {
+  border-color: var(--accent-primary);
+}
+
+.drop-zone:hover,
+.drop-zone.drag-over {
+  border-color: var(--accent-primary);
+  box-shadow: 
+    inset 0 4px 20px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(232, 168, 124, 0.2);
+}
+
+.drop-zone.loaded {
+  border-color: var(--accent-glucose-normal);
+}
+
+.drop-zone.loaded::before {
+  border-color: var(--accent-glucose-normal);
+  border-style: solid;
+}
+
+.drop-zone-icon {
+  font-size: 2.5rem;
+  opacity: 0.4;
+  transition: all 0.3s ease;
+}
+
+.drop-zone:hover .drop-zone-icon {
+  opacity: 0.8;
+  transform: scale(1.1);
+}
+
+.drop-zone-text {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.drop-zone .file-name {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent-glucose-normal);
+  display: none;
+  padding: 4px 12px;
+  background: rgba(143, 188, 143, 0.15);
+  border-radius: var(--radius-sm);
+}
+
+.drop-zone.loaded .file-name { display: block; }
+.drop-zone.loaded .drop-zone-text { display: none; }
+
+#file-input { display: none; }
+

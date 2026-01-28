@@ -1,0 +1,60 @@
+/* Glukoscillator - CSS Variables and Base Tokens */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Warm analog color palette */
+  --bg-primary: #0f0d0b;
+  --bg-secondary: #1a1714;
+  --bg-tertiary: #252019;
+  --bg-elevated: #302a21;
+  --bg-panel: #1e1b17;
+  
+  /* Metal/hardware colors */
+  --metal-dark: #2a2520;
+  --metal-mid: #3d352c;
+  --metal-light: #4a4035;
+  --metal-highlight: #5a4d42;
+  
+  /* Glucose indicators */
+  --accent-glucose-low: #6b9ac4;
+  --accent-glucose-normal: #8fbc8f;
+  --accent-glucose-high: #d4a574;
+  --accent-glucose-danger: #c97064;
+  
+  /* UI accents */
+  --accent-primary: #e8a87c;
+  --accent-secondary: #85677b;
+  --accent-tertiary: #9b8a7c;
+  
+  /* Text */
+  --text-primary: #f0e6d8;
+  --text-secondary: #b8a99a;
+  --text-muted: #6b5d52;
+  --text-label: #8a7d6d;
+  
+  /* Effects */
+  --border-color: rgba(240, 230, 216, 0.08);
+  --glow-color: rgba(232, 168, 124, 0.4);
+  --screw-color: #3a3330;
+  --led-off: #2a2520;
+  --led-on: #e8a87c;
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  
+  /* Fonts */
+  --font-display: 'Syne', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+

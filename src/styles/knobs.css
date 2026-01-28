@@ -1,0 +1,243 @@
+/* Glukoscillator - Knob Controls Styles */
+
+/* =====================================================
+   SYNTH CONTROLS - Knobs on Faceplate
+   ===================================================== */
+.synth-controls {
+  flex: 1;
+  background: linear-gradient(180deg, var(--metal-mid) 0%, var(--metal-dark) 100%);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--metal-dark);
+  padding: var(--spacing-lg);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.controls-faceplate {
+  display: flex;
+  gap: var(--spacing-xl);
+}
+
+.controls-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.label-text {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-label);
+  white-space: nowrap;
+}
+
+.section-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+}
+
+.adsr-section { flex: 1; }
+
+.adsr-controls {
+  display: flex;
+  gap: var(--spacing-lg);
+  justify-content: center;
+}
+
+.volume-section {
+  padding-left: var(--spacing-lg);
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* =====================================================
+   ROTARY KNOBS
+   ===================================================== */
+.knob-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-width: 70px;
+}
+
+.knob-wrapper.knob-large .knob-container {
+  width: 80px;
+  height: 80px;
+}
+
+.knob-wrapper.knob-large .knob {
+  width: 52px;
+  height: 52px;
+}
+
+.knob-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-label);
+}
+
+.knob-container {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dial-indicators {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.dial-indicators .tick-major {
+  stroke: var(--text-secondary);
+  stroke-width: 2;
+}
+
+.dial-indicators .tick-minor {
+  stroke: var(--text-muted);
+  stroke-width: 1;
+  opacity: 0.5;
+}
+
+.knob {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(145deg, var(--metal-highlight) 0%, var(--metal-dark) 100%);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+  transition: box-shadow 0.15s ease;
+}
+
+.knob:hover {
+  box-shadow: 
+    0 4px 15px rgba(0, 0, 0, 0.6),
+    0 0 20px var(--glow-color),
+    inset 0 2px 4px rgba(255, 255, 255, 0.15);
+}
+
+.knob-pointer {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  width: 3px;
+  height: 10px;
+  margin-left: -1.5px;
+  background: var(--accent-primary);
+  border-radius: 2px;
+  box-shadow: 0 0 6px var(--glow-color);
+}
+
+.knob-wrapper.knob-large .knob-pointer {
+  top: 6px;
+  height: 14px;
+  width: 4px;
+  margin-left: -2px;
+}
+
+.knob.active {
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.5),
+    0 0 25px var(--glow-color),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1);
+}
+
+.knob-value {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--accent-primary);
+  padding: 2px 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: var(--radius-sm);
+  min-width: 50px;
+  text-align: center;
+}
+
+/* =====================================================
+   MINI KNOBS (for effect modules)
+   ===================================================== */
+.mini-knob-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.mini-knob-label {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.mini-knob-container {
+  width: 28px;
+  height: 28px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mini-knob {
+  width: 24px;
+  height: 24px;
+  position: relative;
+  background: linear-gradient(145deg, var(--metal-highlight) 0%, var(--metal-dark) 100%);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 
+    0 2px 6px rgba(0, 0, 0, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+.mini-knob:hover {
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.5),
+    0 0 12px var(--glow-color);
+}
+
+.mini-knob.active {
+  box-shadow: 
+    0 1px 4px rgba(0, 0, 0, 0.4),
+    0 0 15px var(--glow-color);
+}
+
+.mini-knob-pointer {
+  position: absolute;
+  top: 3px;
+  left: 50%;
+  width: 2px;
+  height: 6px;
+  margin-left: -1px;
+  background: var(--accent-primary);
+  border-radius: 1px;
+  box-shadow: 0 0 4px var(--accent-primary);
+}
+

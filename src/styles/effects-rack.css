@@ -1,0 +1,245 @@
+/* Glukoscillator - Effects Rack Styles */
+
+/* =====================================================
+   EFFECTS RACK - Stomp Box Modules
+   ===================================================== */
+.effects-rack {
+  background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--metal-dark);
+  overflow: hidden;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.rack-header {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: linear-gradient(180deg, var(--metal-mid) 0%, var(--metal-dark) 100%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.rack-screws {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.screw {
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(145deg, #4a4035 0%, #2a2520 100%);
+  border-radius: 50%;
+  box-shadow: 
+    inset 0 1px 2px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(255, 255, 255, 0.05);
+  position: relative;
+}
+
+.screw::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60%;
+  height: 2px;
+  background: rgba(0, 0, 0, 0.4);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.screw.small {
+  width: 8px;
+  height: 8px;
+}
+
+.rack-title {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.rack-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-label);
+}
+
+.rack-reset-btn {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rack-reset-btn:hover {
+  color: var(--accent-glucose-danger);
+  border-color: var(--accent-glucose-danger);
+}
+
+.effects-pedalboard {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  overflow-x: auto;
+}
+
+/* Individual Effect Module (Stomp Box) */
+.effect-module {
+  flex-shrink: 0;
+  width: 140px;
+  transition: all 0.25s ease;
+}
+
+.effect-module.disabled {
+  opacity: 0.5;
+}
+
+.effect-module.dragging {
+  opacity: 0.6;
+  transform: scale(0.95) rotate(2deg);
+}
+
+.effect-module.drag-over-left {
+  margin-left: 20px;
+}
+
+.effect-module.drag-over-right {
+  margin-right: 20px;
+}
+
+.module-faceplate {
+  background: linear-gradient(180deg, var(--metal-mid) 0%, var(--metal-dark) 100%);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--metal-dark);
+  padding: var(--spacing-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 4px 15px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
+
+.effect-module.enabled .module-faceplate {
+  border-color: var(--accent-color, var(--accent-primary));
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 25px color-mix(in srgb, var(--accent-color, var(--accent-primary)) 30%, transparent);
+}
+
+.module-screws {
+  display: flex;
+  justify-content: space-between;
+}
+
+.module-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) 0;
+}
+
+.module-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--accent-color, var(--accent-primary));
+  opacity: 0.8;
+}
+
+.effect-module.enabled .module-icon {
+  opacity: 1;
+  filter: drop-shadow(0 0 6px var(--accent-color, var(--accent-primary)));
+}
+
+.module-name {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-primary);
+}
+
+.module-knobs {
+  padding: var(--spacing-xs) 0;
+}
+
+.knob-row {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.module-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding-top: var(--spacing-xs);
+}
+
+/* Footswitch button */
+.footswitch {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(180deg, #1a1815 0%, #0f0d0b 100%);
+  border: 2px solid var(--metal-dark);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    inset 0 4px 8px rgba(0, 0, 0, 0.5),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.15s ease;
+}
+
+.footswitch:hover {
+  border-color: var(--accent-primary);
+}
+
+.footswitch:active {
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.footswitch-led {
+  width: 10px;
+  height: 10px;
+  background: var(--led-off);
+  border-radius: 50%;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+}
+
+.footswitch.on .footswitch-led {
+  background: var(--led-on);
+  box-shadow: 
+    0 0 10px var(--led-on),
+    0 0 20px color-mix(in srgb, var(--led-on) 50%, transparent);
+}
+
+.module-label {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+

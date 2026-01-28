@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Glukoscillator - Glucose Wavetable Synthesizer</title>
+    <meta name="description" content="Transform your glucose data into music. Each day becomes a unique playable waveform." />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎹</text></svg>" />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Header -->
+      <header class="header">
+        <div class="logo">
+          <div class="logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+          </div>
+          <span class="logo-text">Glukoscillator</span>
+        </div>
+        <div class="header-status">
+          <span id="midi-status">MIDI: Not connected</span>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Day Selector Sidebar -->
+        <aside id="day-selector" class="day-selector">
+          <div class="no-data">Drop a CSV file to begin</div>
+        </aside>
+
+        <!-- Center Panel -->
+        <div class="center-panel">
+          <!-- Drop Zone - Cartridge Slot -->
+          <div id="drop-zone" class="drop-zone">
+            <div class="drop-zone-icon">💾</div>
+            <div class="drop-zone-text">Insert LibreView Data</div>
+            <div class="file-name"></div>
+            <input type="file" id="file-input" accept=".csv" />
+          </div>
+
+          <!-- Waveform Display -->
+          <div id="waveform-display"></div>
+
+          <!-- Oscillator Mixer -->
+          <div id="oscillator-mixer"></div>
+
+          <!-- Controls Row -->
+          <div class="controls-row">
+            <div id="synth-controls" class="synth-controls"></div>
+          </div>
+
+          <!-- Effects Panel -->
+          <div id="effects-panel"></div>
+        </div>
+      </main>
+
+      <!-- Piano Keyboard -->
+      <section class="keyboard-section">
+        <div id="piano-keyboard" class="piano-keyboard"></div>
+      </section>
+    </div>
+
+    <!-- Start Audio Overlay -->
+    <div id="start-overlay" class="start-overlay">
+      <button id="start-button">Start Audio</button>
+      <p class="start-instructions">
+        Click to enable audio playback.<br />
+        Then drop a LibreView CSV export to load your glucose data.
+      </p>
+    </div>
+
+    <!-- Error Message -->
+    <div id="error-message"></div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

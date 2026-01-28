@@ -1,0 +1,150 @@
+/* Glukoscillator - Day Selector Styles */
+
+/* =====================================================
+   DAY SELECTOR - Patch Browser Style
+   ===================================================== */
+.day-selector {
+  background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--metal-dark);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 0 30px rgba(0, 0, 0, 0.3),
+    0 4px 20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.day-selector-header {
+  padding: var(--spacing-md);
+  background: linear-gradient(180deg, var(--metal-mid) 0%, var(--metal-dark) 100%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.day-count {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.device-name {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  padding: 2px 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-sm);
+}
+
+.day-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-sm);
+}
+
+.day-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  background: transparent;
+}
+
+.day-item:hover {
+  background: rgba(232, 168, 124, 0.08);
+  border-color: rgba(232, 168, 124, 0.2);
+}
+
+.day-item.selected {
+  background: linear-gradient(135deg, rgba(232, 168, 124, 0.15) 0%, rgba(232, 168, 124, 0.05) 100%);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 20px rgba(232, 168, 124, 0.2);
+}
+
+.day-info { flex: 1; }
+
+.day-date {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.day-stats {
+  display: flex;
+  gap: var(--spacing-sm);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.stat { opacity: 0.8; }
+
+.stat.tir {
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+.stat.tir.good {
+  background: rgba(143, 188, 143, 0.25);
+  color: var(--accent-glucose-normal);
+}
+
+.stat.tir.warning {
+  background: rgba(212, 165, 116, 0.25);
+  color: var(--accent-glucose-high);
+}
+
+.stat.tir.bad {
+  background: rgba(201, 112, 100, 0.25);
+  color: var(--accent-glucose-danger);
+}
+
+.day-waveform {
+  width: 60px;
+  height: 24px;
+  opacity: 0.6;
+}
+
+.day-item.selected .day-waveform { opacity: 1; }
+
+.mini-wave {
+  width: 100%;
+  height: 100%;
+  color: var(--accent-primary);
+}
+
+.no-data {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+/* Day selector in selection mode */
+.day-selector.selecting-for-osc {
+  border-color: var(--accent-secondary);
+  box-shadow: 0 0 30px rgba(133, 103, 123, 0.3);
+}
+
+.day-selector.selecting-for-osc .day-item:hover {
+  background: rgba(133, 103, 123, 0.2);
+  border-color: var(--accent-secondary);
+}
+

@@ -1,0 +1,113 @@
+/* Glukoscillator - Piano Keyboard Styles */
+
+/* =====================================================
+   PIANO KEYBOARD - Hardware Style
+   ===================================================== */
+.keyboard-section {
+  background: linear-gradient(180deg, var(--metal-mid) 0%, var(--metal-dark) 100%);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--metal-dark);
+  padding: var(--spacing-md);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.piano-keyboard {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  height: 150px;
+  user-select: none;
+  padding: 10px;
+  background: linear-gradient(180deg, #1a1815 0%, #0f0d0b 100%);
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.piano-key {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding-bottom: var(--spacing-sm);
+  cursor: pointer;
+  transition: all 0.08s ease;
+}
+
+/* White keys - Ivory style */
+.white-key {
+  width: 44px;
+  height: 140px;
+  background: linear-gradient(180deg, #f5f0e6 0%, #ede5d8 40%, #e8dfd0 70%, #ddd4c4 100%);
+  border: 1px solid #c4b8a5;
+  border-radius: 0 0 6px 6px;
+  z-index: 1;
+  margin-right: -1px;
+  box-shadow: 
+    inset 0 -4px 8px rgba(0, 0, 0, 0.1),
+    inset 2px 0 4px rgba(255, 255, 255, 0.4),
+    0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.white-key:hover {
+  background: linear-gradient(180deg, #faf6ee 0%, #f2ebe0 40%, #ede5d8 70%, #e3dace 100%);
+}
+
+.white-key.active {
+  background: linear-gradient(180deg, var(--accent-primary) 0%, #c48a5c 100%);
+  border-color: var(--accent-primary);
+  box-shadow: 
+    0 0 30px var(--glow-color),
+    inset 0 2px 4px rgba(255, 255, 255, 0.3);
+  transform: translateY(4px);
+}
+
+/* Black keys - Ebony style */
+.black-key {
+  width: 28px;
+  height: 95px;
+  background: linear-gradient(180deg, #3d3530 0%, #2a2520 30%, #1f1b18 70%, #151210 100%);
+  border: 1px solid #0a0908;
+  border-radius: 0 0 4px 4px;
+  margin-left: -14px;
+  margin-right: -14px;
+  z-index: 2;
+  box-shadow: 
+    inset 0 -3px 6px rgba(255, 255, 255, 0.05),
+    inset 0 3px 4px rgba(255, 255, 255, 0.08),
+    0 6px 12px rgba(0, 0, 0, 0.5);
+}
+
+.black-key:hover {
+  background: linear-gradient(180deg, #4a423c 0%, #352f2a 30%, #252220 70%, #1a1715 100%);
+}
+
+.black-key.active {
+  background: linear-gradient(180deg, var(--accent-secondary) 0%, #5a4555 100%);
+  box-shadow: 
+    0 0 20px rgba(133, 103, 123, 0.6),
+    inset 0 2px 4px rgba(255, 255, 255, 0.15);
+  transform: translateY(3px);
+}
+
+.key-shortcut {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  margin-bottom: 2px;
+  opacity: 0.6;
+}
+
+.white-key .key-shortcut { color: #8a7d6d; }
+.black-key .key-shortcut { color: #6b5d52; }
+
+.key-note {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  opacity: 0.4;
+}
+
+.white-key .key-note { color: #6b5d52; }
+.black-key .key-note { color: #9b8a7c; }
+

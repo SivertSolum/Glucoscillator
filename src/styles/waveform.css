@@ -1,0 +1,52 @@
+/* Glukoscillator - Waveform Display Styles */
+
+/* =====================================================
+   WAVEFORM DISPLAY - Oscilloscope Style
+   ===================================================== */
+#waveform-display {
+  flex: 1 1 200px;
+  background: #080806;
+  border-radius: var(--radius-lg);
+  border: 3px solid var(--metal-dark);
+  overflow: hidden;
+  min-height: 180px;
+  max-height: 300px;
+  position: relative;
+  box-shadow: 
+    inset 0 0 50px rgba(0, 0, 0, 0.8),
+    0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Oscilloscope bezel */
+#waveform-display::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-lg);
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* CRT scanlines */
+#waveform-display::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  z-index: 2;
+}
+
+.waveform-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
