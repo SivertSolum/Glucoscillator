@@ -23,7 +23,16 @@ import type {
   EffectChangeCallback,
   OrderChangeCallback,
 } from './effects-types';
-import { DEFAULT_ORDER, STORAGE_KEY, RANDOM_RANGES } from './effects-config';
+import { 
+  DEFAULT_ORDER, 
+  STORAGE_KEY, 
+  RANDOM_RANGES,
+  EFFECT_CATEGORIES,
+  GLUCOSE_THRESHOLDS,
+  normalizeGlucoseStat,
+  scaleInRange,
+  type GlucoseStatsWithVolatility,
+} from './effects-config';
 
 // Re-export types and config for convenience
 export * from './effects-types';
@@ -43,6 +52,7 @@ export class EffectsChain {
   private output: Tone.Gain;
   private onChangeCallback: EffectChangeCallback | null = null;
   private onOrderChangeCallback: OrderChangeCallback | null = null;
+  private bypassed: Set<EffectId> = new Set();
 
   // Individual effect references for parameter access
   private compressor!: Tone.Compressor;
@@ -159,8 +169,8 @@ export class EffectsChain {
   }
 
   /**
-   * Rewire the effects chain - only enabled effects are connected
-   * Disabled effects are completely bypassed (no audio processing overhead)
+   * Rewire the effects chain - only enabled and non-bypassed effects are connected
+   * Disabled or bypassed effects are completely bypassed (no audio processing overhead)
    */
   private rewireChain(): void {
     // Disconnect everything first
@@ -171,10 +181,10 @@ export class EffectsChain {
 
     let currentNode: Tone.ToneAudioNode = this.input;
     
-    // Only connect enabled effects in order
+    // Only connect enabled and non-bypassed effects in order
     for (const effectId of this.order) {
       const effect = this.effects.get(effectId);
-      if (effect && effect.enabled) {
+      if (effect && effect.enabled && !this.bypassed.has(effectId)) {
         currentNode.connect(effect.node);
         currentNode = effect.node;
       }
@@ -215,6 +225,32 @@ export class EffectsChain {
 
   isEnabled(effectId: EffectId): boolean {
     return this.effects.get(effectId)?.enabled ?? false;
+  }
+
+  setBypassed(effectId: EffectId, bypassed: boolean): void {
+    const effect = this.effects.get(effectId);
+    if (!effect) return;
+    
+    if (bypassed) {
+      this.bypassed.add(effectId);
+    } else {
+      this.bypassed.delete(effectId);
+    }
+    
+    // Rewire chain to add/remove the effect from audio path
+    this.rewireChain();
+    
+    this.onChangeCallback?.(effectId, this.getEffectParams(effectId));
+  }
+
+  isBypassed(effectId: EffectId): boolean {
+    return this.bypassed.has(effectId);
+  }
+
+  toggleBypassed(effectId: EffectId): boolean {
+    const newState = !this.isBypassed(effectId);
+    this.setBypassed(effectId, newState);
+    return newState;
   }
 
   getEffectParams(effectId: EffectId): any {
@@ -479,6 +515,202 @@ export class EffectsChain {
   }
 
   /**
+   * Randomize effects based on glucose data statistics
+   * Effects are selected and parameters scaled based on glucose characteristics
+   */
+  randomizeFromGlucose(stats: GlucoseStatsWithVolatility): void {
+    // First, disable all effects
+    for (const effectId of DEFAULT_ORDER) {
+      this.setEnabled(effectId, false);
+    }
+
+    // Normalize stats for use in parameter scaling
+    const volatilityNorm = normalizeGlucoseStat(stats.volatility, 'volatility');
+    const avgNorm = normalizeGlucoseStat(stats.avg, 'average');
+    const tirNorm = normalizeGlucoseStat(stats.timeInRange, 'timeInRange');
+    
+    // Select effects based on glucose characteristics
+    const selectedEffects = new Set<EffectId>();
+    
+    // Volatility-based effects
+    if (stats.volatility >= GLUCOSE_THRESHOLDS.volatility.high) {
+      // High volatility: enable chaotic effects
+      EFFECT_CATEGORIES.highVolatility.forEach(e => selectedEffects.add(e));
+    } else if (stats.volatility <= GLUCOSE_THRESHOLDS.volatility.low) {
+      // Low volatility: enable smooth/ambient effects
+      EFFECT_CATEGORIES.lowVolatility.forEach(e => selectedEffects.add(e));
+    } else {
+      // Medium volatility: pick one from each category
+      const highVolIdx = Math.floor(volatilityNorm * EFFECT_CATEGORIES.highVolatility.length);
+      const lowVolIdx = Math.floor((1 - volatilityNorm) * EFFECT_CATEGORIES.lowVolatility.length);
+      selectedEffects.add(EFFECT_CATEGORIES.highVolatility[Math.min(highVolIdx, EFFECT_CATEGORIES.highVolatility.length - 1)]);
+      selectedEffects.add(EFFECT_CATEGORIES.lowVolatility[Math.min(lowVolIdx, EFFECT_CATEGORIES.lowVolatility.length - 1)]);
+    }
+    
+    // Average glucose-based effects
+    if (stats.avg >= GLUCOSE_THRESHOLDS.average.high) {
+      // High average: modulation effects
+      EFFECT_CATEGORIES.highAverage.forEach(e => selectedEffects.add(e));
+    } else if (stats.avg <= GLUCOSE_THRESHOLDS.average.low) {
+      // Low average: stabilizing effects
+      EFFECT_CATEGORIES.lowAverage.forEach(e => selectedEffects.add(e));
+    } else {
+      // Medium: pick one based on where average falls
+      if (avgNorm > 0.5) {
+        selectedEffects.add(EFFECT_CATEGORIES.highAverage[Math.floor(Math.random() * EFFECT_CATEGORIES.highAverage.length)]);
+      } else {
+        selectedEffects.add(EFFECT_CATEGORIES.lowAverage[Math.floor(Math.random() * EFFECT_CATEGORIES.lowAverage.length)]);
+      }
+    }
+    
+    // Time-in-range based effects
+    if (stats.timeInRange >= GLUCOSE_THRESHOLDS.timeInRange.good) {
+      // Good TIR: spacious, pleasant effects
+      const goodEffects = EFFECT_CATEGORIES.goodTIR;
+      selectedEffects.add(goodEffects[Math.floor(tirNorm * goodEffects.length) % goodEffects.length]);
+    } else if (stats.timeInRange <= GLUCOSE_THRESHOLDS.timeInRange.poor) {
+      // Poor TIR: filtering effects
+      EFFECT_CATEGORIES.poorTIR.forEach(e => selectedEffects.add(e));
+    } else {
+      // Medium TIR: pick one based on TIR value
+      if (tirNorm > 0.5) {
+        selectedEffects.add(EFFECT_CATEGORIES.goodTIR[Math.floor(Math.random() * EFFECT_CATEGORIES.goodTIR.length)]);
+      } else {
+        selectedEffects.add(EFFECT_CATEGORIES.poorTIR[Math.floor(Math.random() * EFFECT_CATEGORIES.poorTIR.length)]);
+      }
+    }
+
+    // Set parameters based on glucose stats
+    // Higher volatility = more intense effect parameters
+    // Higher average = faster modulation rates
+    // Higher TIR = wetter/more spacious
+    
+    // Compressor: low average = more compression
+    const compressorIntensity = 1 - avgNorm; // Lower average = more compression
+    this.setCompressor({
+      threshold: scaleInRange(compressorIntensity, RANDOM_RANGES.compressor.threshold.min, RANDOM_RANGES.compressor.threshold.max),
+      ratio: scaleInRange(compressorIntensity, RANDOM_RANGES.compressor.ratio.min, RANDOM_RANGES.compressor.ratio.max),
+      enabled: selectedEffects.has('compressor'),
+    });
+
+    // EQ3: shape based on glucose range
+    const lowBoost = (1 - avgNorm) * 2 - 1; // Low glucose = boost lows
+    const highBoost = avgNorm * 2 - 1; // High glucose = boost highs
+    this.setEQ3({
+      low: scaleInRange(0.5 + lowBoost * 0.5, RANDOM_RANGES.eq3.low.min, RANDOM_RANGES.eq3.low.max),
+      mid: scaleInRange(0.5, RANDOM_RANGES.eq3.mid.min, RANDOM_RANGES.eq3.mid.max),
+      high: scaleInRange(0.5 + highBoost * 0.5, RANDOM_RANGES.eq3.high.min, RANDOM_RANGES.eq3.high.max),
+      enabled: selectedEffects.has('eq3'),
+    });
+
+    // BitCrusher: high volatility = lower bits (more crushed)
+    this.setBitCrusher({
+      bits: Math.round(scaleInRange(1 - volatilityNorm, RANDOM_RANGES.bitcrusher.bits.min, RANDOM_RANGES.bitcrusher.bits.max)),
+      wet: scaleInRange(volatilityNorm, RANDOM_RANGES.bitcrusher.wet.min, RANDOM_RANGES.bitcrusher.wet.max),
+      enabled: selectedEffects.has('bitcrusher'),
+    });
+
+    // Distortion: high volatility = more distortion
+    this.setDistortion({
+      amount: scaleInRange(volatilityNorm, RANDOM_RANGES.distortion.amount.min, RANDOM_RANGES.distortion.amount.max),
+      wet: scaleInRange(volatilityNorm * 0.8, RANDOM_RANGES.distortion.wet.min, RANDOM_RANGES.distortion.wet.max),
+      enabled: selectedEffects.has('distortion'),
+    });
+
+    // AutoWah: poor TIR = more aggressive filtering
+    const wahIntensity = 1 - tirNorm;
+    this.setAutoWah({
+      baseFrequency: scaleInRange(wahIntensity, RANDOM_RANGES.autowah.baseFrequency.min, RANDOM_RANGES.autowah.baseFrequency.max),
+      octaves: Math.round(scaleInRange(wahIntensity, RANDOM_RANGES.autowah.octaves.min, RANDOM_RANGES.autowah.octaves.max)),
+      wet: scaleInRange(wahIntensity * 0.8, RANDOM_RANGES.autowah.wet.min, RANDOM_RANGES.autowah.wet.max),
+      enabled: selectedEffects.has('autowah'),
+    });
+
+    // AutoFilter: poor TIR = faster, deeper filtering
+    this.setAutoFilter({
+      frequency: scaleInRange(1 - tirNorm, RANDOM_RANGES.autofilter.frequency.min, RANDOM_RANGES.autofilter.frequency.max),
+      depth: scaleInRange(1 - tirNorm, RANDOM_RANGES.autofilter.depth.min, RANDOM_RANGES.autofilter.depth.max),
+      octaves: Math.round(scaleInRange(1 - tirNorm, RANDOM_RANGES.autofilter.octaves.min, RANDOM_RANGES.autofilter.octaves.max)),
+      wet: scaleInRange((1 - tirNorm) * 0.8, RANDOM_RANGES.autofilter.wet.min, RANDOM_RANGES.autofilter.wet.max),
+      enabled: selectedEffects.has('autofilter'),
+    });
+
+    // Phaser: low volatility = slow, subtle phasing
+    const phaserIntensity = 1 - volatilityNorm;
+    this.setPhaser({
+      frequency: scaleInRange(phaserIntensity * 0.5, RANDOM_RANGES.phaser.frequency.min, RANDOM_RANGES.phaser.frequency.max),
+      octaves: Math.round(scaleInRange(phaserIntensity, RANDOM_RANGES.phaser.octaves.min, RANDOM_RANGES.phaser.octaves.max)),
+      wet: scaleInRange(phaserIntensity * 0.7, RANDOM_RANGES.phaser.wet.min, RANDOM_RANGES.phaser.wet.max),
+      enabled: selectedEffects.has('phaser'),
+    });
+
+    // Chorus: low volatility = lush chorus
+    const chorusIntensity = 1 - volatilityNorm;
+    this.setChorus({
+      frequency: scaleInRange(chorusIntensity * 0.5, RANDOM_RANGES.chorus.frequency.min, RANDOM_RANGES.chorus.frequency.max),
+      depth: scaleInRange(chorusIntensity, RANDOM_RANGES.chorus.depth.min, RANDOM_RANGES.chorus.depth.max),
+      wet: scaleInRange(chorusIntensity * 0.6, RANDOM_RANGES.chorus.wet.min, RANDOM_RANGES.chorus.wet.max),
+      enabled: selectedEffects.has('chorus'),
+    });
+
+    // Tremolo: high average = faster tremolo
+    this.setTremolo({
+      frequency: scaleInRange(avgNorm, RANDOM_RANGES.tremolo.frequency.min, RANDOM_RANGES.tremolo.frequency.max),
+      depth: scaleInRange(avgNorm, RANDOM_RANGES.tremolo.depth.min, RANDOM_RANGES.tremolo.depth.max),
+      wet: scaleInRange(avgNorm * 0.8, RANDOM_RANGES.tremolo.wet.min, RANDOM_RANGES.tremolo.wet.max),
+      enabled: selectedEffects.has('tremolo'),
+    });
+
+    // Vibrato: high average = faster vibrato
+    this.setVibrato({
+      frequency: scaleInRange(avgNorm, RANDOM_RANGES.vibrato.frequency.min, RANDOM_RANGES.vibrato.frequency.max),
+      depth: scaleInRange(avgNorm * 0.8, RANDOM_RANGES.vibrato.depth.min, RANDOM_RANGES.vibrato.depth.max),
+      wet: scaleInRange(avgNorm * 0.7, RANDOM_RANGES.vibrato.wet.min, RANDOM_RANGES.vibrato.wet.max),
+      enabled: selectedEffects.has('vibrato'),
+    });
+
+    // FreqShift: high volatility = more dramatic shift
+    const shiftAmount = (volatilityNorm - 0.5) * 2; // -1 to 1
+    this.setFreqShift({
+      frequency: scaleInRange(0.5 + shiftAmount * 0.5, RANDOM_RANGES.freqshift.frequency.min, RANDOM_RANGES.freqshift.frequency.max),
+      wet: scaleInRange(volatilityNorm * 0.6, RANDOM_RANGES.freqshift.wet.min, RANDOM_RANGES.freqshift.wet.max),
+      enabled: selectedEffects.has('freqshift'),
+    });
+
+    // PitchShift: based on glucose range deviation
+    const pitchDirection = avgNorm > 0.5 ? 1 : -1;
+    const pitchAmount = Math.abs(avgNorm - 0.5) * 2;
+    this.setPitchShift({
+      pitch: Math.round(pitchDirection * scaleInRange(pitchAmount, 0, RANDOM_RANGES.pitchshift.pitch.max)),
+      wet: scaleInRange(tirNorm * 0.8, RANDOM_RANGES.pitchshift.wet.min, RANDOM_RANGES.pitchshift.wet.max),
+      enabled: selectedEffects.has('pitchshift'),
+    });
+
+    // Delay: good TIR = longer, more feedback
+    this.setDelay({
+      time: scaleInRange(tirNorm, RANDOM_RANGES.delay.time.min, RANDOM_RANGES.delay.time.max),
+      feedback: scaleInRange(tirNorm * 0.8, RANDOM_RANGES.delay.feedback.min, RANDOM_RANGES.delay.feedback.max),
+      wet: scaleInRange(tirNorm * 0.5, RANDOM_RANGES.delay.wet.min, RANDOM_RANGES.delay.wet.max),
+      enabled: selectedEffects.has('delay'),
+    });
+
+    // Reverb: low volatility + good TIR = lush reverb
+    const reverbIntensity = (1 - volatilityNorm) * tirNorm;
+    this.setReverb({
+      decay: scaleInRange(reverbIntensity, RANDOM_RANGES.reverb.decay.min, RANDOM_RANGES.reverb.decay.max),
+      wet: scaleInRange(reverbIntensity * 0.5, RANDOM_RANGES.reverb.wet.min, RANDOM_RANGES.reverb.wet.max),
+      enabled: selectedEffects.has('reverb'),
+    });
+
+    // StereoWidener: good TIR = wider stereo
+    this.setStereoWidener({
+      width: scaleInRange(tirNorm, RANDOM_RANGES.stereowidener.width.min, RANDOM_RANGES.stereowidener.width.max),
+      wet: scaleInRange(tirNorm, RANDOM_RANGES.stereowidener.wet.min, RANDOM_RANGES.stereowidener.wet.max),
+      enabled: selectedEffects.has('stereowidener'),
+    });
+  }
+
+  /**
    * Get list of enabled effects in order
    */
   getEnabledEffects(): EffectId[] {
@@ -493,6 +725,9 @@ export class EffectsChain {
   }
 
   reset(): void {
+    // Clear all bypass states
+    this.bypassed.clear();
+    
     this.setCompressor({ threshold: -20, ratio: 4, attack: 0.003, release: 0.25, enabled: false });
     this.setEQ3({ low: 0, mid: 0, high: 0, enabled: false });
     this.setBitCrusher({ bits: 8, wet: 0.5, enabled: false });

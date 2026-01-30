@@ -378,9 +378,10 @@ export class EffectsPanel {
   private createEffectModule(effectId: EffectId): HTMLElement {
     const params = this.effectsChain.getEffectParams(effectId);
     const accentColor = EFFECT_COLORS[effectId];
+    const isBypassed = this.effectsChain.isBypassed(effectId);
 
     const module = document.createElement('div');
-    module.className = 'effect-module enabled';
+    module.className = `effect-module enabled${isBypassed ? ' bypassed' : ''}`;
     module.id = `effect-module-${effectId}`;
     module.draggable = true;
     module.dataset.effect = effectId;
@@ -395,6 +396,9 @@ export class EffectsPanel {
         </div>
         <div class="module-knobs">${this.getEffectKnobsHTML(effectId, params)}</div>
         <div class="module-footer">
+          <button class="footswitch${isBypassed ? '' : ' on'}" title="${isBypassed ? 'Enable effect' : 'Bypass effect'}">
+            <div class="footswitch-led"></div>
+          </button>
           <div class="module-label">${effectId.toUpperCase()}</div>
         </div>
         <div class="module-screws bottom"><div class="screw small"></div><div class="screw small"></div></div>
@@ -405,9 +409,32 @@ export class EffectsPanel {
       e.stopPropagation();
       this.removeEffect(effectId);
     });
+    
+    // Footswitch toggle handler
+    const footswitch = module.querySelector('.footswitch') as HTMLElement;
+    footswitch?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleEffectBypass(effectId, module, footswitch);
+    });
+    
     this.setupKnobHandlers(module, effectId);
     this.setupDragHandlers(module, effectId);
     return module;
+  }
+
+  private toggleEffectBypass(effectId: EffectId, module: HTMLElement, footswitch: HTMLElement): void {
+    const newBypassed = this.effectsChain.toggleBypassed(effectId);
+    
+    // Update visual state
+    if (newBypassed) {
+      module.classList.add('bypassed');
+      footswitch.classList.remove('on');
+      footswitch.title = 'Enable effect';
+    } else {
+      module.classList.remove('bypassed');
+      footswitch.classList.add('on');
+      footswitch.title = 'Bypass effect';
+    }
   }
 
   private getEffectKnobsHTML(effectId: EffectId, params: any): string {
@@ -572,6 +599,21 @@ export class EffectsPanel {
     }
     
     if (!module) return;
+    
+    // Update bypass state visuals
+    const isBypassed = this.effectsChain.isBypassed(effectId);
+    const footswitch = module.querySelector('.footswitch') as HTMLElement;
+    
+    if (isBypassed) {
+      module.classList.add('bypassed');
+      footswitch?.classList.remove('on');
+      if (footswitch) footswitch.title = 'Enable effect';
+    } else {
+      module.classList.remove('bypassed');
+      footswitch?.classList.add('on');
+      if (footswitch) footswitch.title = 'Bypass effect';
+    }
+    
     this.updateKnobValues(module, effectId, this.effectsChain.getEffectParams(effectId));
   }
 

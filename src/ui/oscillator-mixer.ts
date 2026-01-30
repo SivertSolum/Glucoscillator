@@ -6,6 +6,14 @@ import { getSynth, GlucoseSynth } from '../synthesis/synth-engine';
 import { getWaveformForDisplay } from '../synthesis/wavetable';
 import { formatDateForDisplay } from '../parser/libreview';
 import type { DailyGlucoseData, ParsedLibreViewData } from '../types';
+import {
+  computeVolatility,
+  combineGlucoseStats,
+  normalizeGlucoseStat,
+  scaleInRange,
+  ENVELOPE_RANGES,
+  type GlucoseStatsWithVolatility,
+} from '../synthesis/effects-config';
 
 type OscillatorChangeCallback = (oscIndex: number, dayData: DailyGlucoseData | null) => void;
 
@@ -141,7 +149,8 @@ export class OscillatorMixer {
   }
 
   /**
-   * Randomize all oscillators and effects
+   * Randomize all oscillators and effects based on glucose data
+   * Effects and envelope are determined by the glucose characteristics of selected days
    */
   randomize(): void {
     if (!this.data || this.data.days.size === 0) return;
@@ -155,10 +164,97 @@ export class OscillatorMixer {
       this.setOscillatorDay(i, randomDate);
     }
     
-    // Randomize effects chain parameters
-    this.synth.getEffectsChain().randomize();
+    // Collect glucose stats from all selected days
+    const statsArray = this.collectGlucoseStats();
+    
+    if (statsArray.length > 0) {
+      // Combine stats from all active oscillators
+      const combinedStats = combineGlucoseStats(statsArray);
+      
+      // Randomize effects based on glucose data
+      this.synth.getEffectsChain().randomizeFromGlucose(combinedStats);
+      
+      // Set envelope based on glucose data
+      this.setEnvelopeFromGlucose(combinedStats);
+    } else {
+      // Fallback to random if no data
+      this.synth.getEffectsChain().randomize();
+    }
     
     this.onRandomizeCallback?.();
+  }
+
+  /**
+   * Collect glucose stats with volatility from all selected oscillator days
+   */
+  private collectGlucoseStats(): GlucoseStatsWithVolatility[] {
+    if (!this.data) return [];
+    
+    const statsArray: GlucoseStatsWithVolatility[] = [];
+    
+    for (const date of this.selectedDays) {
+      if (!date) continue;
+      
+      const dayData = this.data.days.get(date);
+      if (!dayData) continue;
+      
+      // Compute volatility from readings
+      const volatility = computeVolatility(dayData.readings);
+      
+      statsArray.push({
+        min: dayData.stats.min,
+        max: dayData.stats.max,
+        avg: dayData.stats.avg,
+        timeInRange: dayData.stats.timeInRange,
+        volatility,
+      });
+    }
+    
+    return statsArray;
+  }
+
+  /**
+   * Set envelope ADSR values based on glucose statistics
+   * - High volatility = short attack/decay (punchy, aggressive)
+   * - Low volatility = long attack/decay (smooth, pad-like)
+   * - High average = lower sustain (instability)
+   * - Good time-in-range = longer release (pleasant sustain)
+   */
+  private setEnvelopeFromGlucose(stats: GlucoseStatsWithVolatility): void {
+    const volatilityNorm = normalizeGlucoseStat(stats.volatility, 'volatility');
+    const avgNorm = normalizeGlucoseStat(stats.avg, 'average');
+    const tirNorm = normalizeGlucoseStat(stats.timeInRange, 'timeInRange');
+    
+    // High volatility = short attack (inverse relationship)
+    const attack = scaleInRange(
+      1 - volatilityNorm,
+      ENVELOPE_RANGES.attack.min,
+      ENVELOPE_RANGES.attack.max
+    );
+    
+    // High volatility = short decay (inverse relationship)
+    const decay = scaleInRange(
+      1 - volatilityNorm,
+      ENVELOPE_RANGES.decay.min,
+      ENVELOPE_RANGES.decay.max
+    );
+    
+    // High average glucose = lower sustain (represents instability)
+    const sustain = scaleInRange(
+      1 - avgNorm,
+      ENVELOPE_RANGES.sustain.min,
+      ENVELOPE_RANGES.sustain.max
+    );
+    
+    // Good time-in-range = longer release (pleasant, natural decay)
+    const release = scaleInRange(
+      tirNorm,
+      ENVELOPE_RANGES.release.min,
+      ENVELOPE_RANGES.release.max
+    );
+    
+    // Apply envelope to synth
+    this.synth.setEnvelope({ attack, decay, sustain, release });
   }
   
   /**

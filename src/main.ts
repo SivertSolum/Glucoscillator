@@ -8,7 +8,7 @@ import { getSynth } from './synthesis/synth-engine';
 import { getKeyboardHandler } from './input/keyboard-handler';
 import { getMIDIHandler, MIDIHandler } from './input/midi-handler';
 import { createPianoKeyboard, PianoKeyboard } from './ui/piano-keyboard';
-import { createSynthControls } from './ui/controls';
+import { createSynthControls, SynthControls } from './ui/controls';
 import { createOscillatorMixer, OscillatorMixer } from './ui/oscillator-mixer';
 import { createEffectsPanel } from './ui/effects-panel';
 import type { ParsedLibreViewData } from './types';
@@ -17,6 +17,7 @@ import type { ParsedLibreViewData } from './types';
 let glucoseData: ParsedLibreViewData | null = null;
 let pianoKeyboard: PianoKeyboard | null = null;
 let oscillatorMixer: OscillatorMixer | null = null;
+let synthControls: SynthControls | null = null;
 let isAudioStarted = false;
 
 /**
@@ -32,7 +33,7 @@ async function init(): Promise<void> {
   pianoKeyboard = createPianoKeyboard('piano-keyboard');
   oscillatorMixer = createOscillatorMixer('oscillator-mixer');
   createEffectsPanel('effects-panel');
-  createSynthControls('synth-controls');
+  synthControls = createSynthControls('synth-controls');
 
   // Set up oscillator mixer callbacks
   oscillatorMixer.onChange((_oscIndex, _dayData) => {
@@ -40,7 +41,8 @@ async function init(): Promise<void> {
   });
 
   oscillatorMixer.onRandomize(() => {
-    // Randomize complete
+    // Sync envelope knobs after randomization
+    synthControls?.syncFromSynth();
   });
 
   // Set up keyboard handler callbacks for visual feedback

@@ -325,11 +325,64 @@ export class SynthControls {
   }
 
   /**
-   * Set envelope values programmatically
+   * Set envelope values programmatically and update knob visuals
    */
   setEnvelope(envelope: Partial<ADSREnvelope>): void {
     this.envelope = { ...this.envelope, ...envelope };
-    this.render();
+    
+    // Update each knob visual without re-rendering
+    if (envelope.attack !== undefined) {
+      this.updateKnobVisual('attack', envelope.attack, 0.001, 2);
+    }
+    if (envelope.decay !== undefined) {
+      this.updateKnobVisual('decay', envelope.decay, 0.001, 2);
+    }
+    if (envelope.sustain !== undefined) {
+      this.updateKnobVisual('sustain', envelope.sustain, 0, 1);
+    }
+    if (envelope.release !== undefined) {
+      this.updateKnobVisual('release', envelope.release, 0.001, 4);
+    }
+    
+    // Sync with synth
+    this.updateSynth();
+  }
+
+  /**
+   * Update a single knob's visual state without re-rendering
+   */
+  private updateKnobVisual(id: string, value: number, min: number, max: number): void {
+    const knob = document.getElementById(`knob-${id}`);
+    const valueDisplay = document.getElementById(`knob-value-${id}`);
+    
+    if (knob) {
+      // Clamp value to valid range
+      const clampedValue = Math.max(min, Math.min(max, value));
+      knob.dataset.value = String(clampedValue);
+      const rotation = this.valueToRotation(clampedValue, min, max);
+      knob.style.transform = `rotate(${rotation}deg)`;
+      
+      // Update internal state
+      (knob as any)._min = min;
+      (knob as any)._max = max;
+    }
+    
+    if (valueDisplay) {
+      valueDisplay.textContent = this.formatValue(value, id);
+    }
+  }
+
+  /**
+   * Sync envelope from synth (for external changes)
+   */
+  syncFromSynth(): void {
+    const synthEnvelope = this.synth.getEnvelope();
+    this.envelope = { ...synthEnvelope };
+    
+    this.updateKnobVisual('attack', this.envelope.attack, 0.001, 2);
+    this.updateKnobVisual('decay', this.envelope.decay, 0.001, 2);
+    this.updateKnobVisual('sustain', this.envelope.sustain, 0, 1);
+    this.updateKnobVisual('release', this.envelope.release, 0.001, 4);
   }
 }
 
