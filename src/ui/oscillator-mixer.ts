@@ -534,11 +534,24 @@ export class OscillatorMixer {
 
     // Randomize button handler - stop propagation to prevent oscillator slot activation
     const randomizeBtn = header.querySelector('#randomize-btn');
-    randomizeBtn?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      this.randomize();
-    });
+    if (randomizeBtn) {
+      // Prevent any clicks on header from bubbling
+      header.addEventListener('click', (e) => e.stopPropagation());
+      
+      // Handle both click and touch events
+      randomizeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        this.randomize();
+      });
+      
+      // Touch events for mobile
+      randomizeBtn.addEventListener('touchend', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        this.randomize();
+      }, { passive: false });
+    }
 
     // Oscillator slots
     const slotsContainer = document.createElement('div');
@@ -643,13 +656,30 @@ export class OscillatorMixer {
 
     // Click to toggle dropdown
     slot.addEventListener('click', (e) => {
-      // Don't toggle if clicking on slider or clear button
-      if ((e.target as HTMLElement).closest('.osc-level') || 
-          (e.target as HTMLElement).closest('.osc-clear-btn') ||
-          (e.target as HTMLElement).closest('.osc-dropdown-panel')) {
+      // Don't toggle if clicking on slider, clear button, dropdown panel, or mixer header
+      const target = e.target as HTMLElement;
+      if (target.closest('.osc-level') || 
+          target.closest('.osc-clear-btn') ||
+          target.closest('.osc-dropdown-panel') ||
+          target.closest('.mixer-header') ||
+          target.closest('.randomize-btn')) {
         return;
       }
       this.toggleDropdown(index, e);
+    });
+    
+    // Touch event for mobile
+    slot.addEventListener('touchend', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('.osc-level') || 
+          target.closest('.osc-clear-btn') ||
+          target.closest('.osc-dropdown-panel') ||
+          target.closest('.mixer-header') ||
+          target.closest('.randomize-btn')) {
+        return;
+      }
+      // Only toggle if not already handled by click
+      // This prevents double-firing on some devices
     });
     
     // Hover to show waveform preview (only when dropdown is closed)

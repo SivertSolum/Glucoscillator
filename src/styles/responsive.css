@@ -85,26 +85,24 @@
 }
 
 @media (pointer: coarse) {
-  .piano-key {
-    min-width: 40px;
-  }
+  /* Don't set min-width on piano-key - it breaks the layout */
   
-  .knob {
+  .desktop-view .knob {
     width: 44px;
     height: 44px;
   }
   
-  .mini-knob {
+  .desktop-view .mini-knob {
     width: 32px;
     height: 32px;
   }
   
-  .mini-knob-container {
+  .desktop-view .mini-knob-container {
     width: 36px;
     height: 36px;
   }
   
-  .footswitch {
+  .desktop-view .footswitch {
     width: 44px;
     height: 44px;
   }
@@ -353,6 +351,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: flex-start;
+  gap: 0; /* Explicitly no gap */
   height: 100%;
   width: 100%;
   max-width: 100%;
@@ -372,6 +371,9 @@
 /* Mobile keyboard specific key sizes */
 .mobile-piano-keyboard .piano-key {
   flex-shrink: 0;
+  flex-grow: 0;
+  margin: 0;
+  padding-bottom: var(--spacing-sm);
 }
 
 .mobile-piano-keyboard .white-key {
@@ -379,6 +381,9 @@
   min-width: 44px;
   height: calc(100% - 20px);
   max-height: 140px;
+  margin-right: -1px;
+  border: 1px solid #c4b8a5;
+  box-sizing: border-box;
 }
 
 .mobile-piano-keyboard .black-key {
@@ -388,6 +393,7 @@
   max-height: 85px;
   margin-left: -14px;
   margin-right: -14px;
+  box-sizing: border-box;
 }
 
 /* Hide key labels on mobile for cleaner look */
@@ -629,7 +635,7 @@
   font-size: 0.65rem;
 }
 
-/* Mobile effects dropdown - opens downward on mobile */
+/* Mobile effects dropdown - opens upward on mobile */
 .mobile-effects-container .add-effect-dropdown {
   margin-top: var(--spacing-xs);
   flex-shrink: 0;
@@ -644,32 +650,34 @@
   font-size: 0.65rem;
 }
 
-/* Override the upward-opening panel for mobile - open downward */
-.mobile-effects-container .add-effect-panel {
-  position: absolute;
-  bottom: auto;
-  top: auto;
-  left: 0;
-  right: 0;
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-  border: 1px solid var(--accent-primary);
-  border-radius: var(--radius-md);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  transition: max-height 0.3s ease, opacity 0.3s ease;
-}
+/* Mobile effects panel - use fixed positioning for reliability */
+@media (max-width: 768px) and (pointer: coarse) {
+  .mobile-effects-container .add-effect-panel {
+    position: fixed !important;
+    bottom: 120px !important;
+    top: auto !important;
+    left: 8px !important;
+    right: 8px !important;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    border: 1px solid var(--accent-primary);
+    border-radius: var(--radius-md);
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+  }
 
-.mobile-effects-container .add-effect-dropdown.open .add-effect-panel {
-  max-height: 200px;
-  opacity: 1;
-  overflow-y: auto;
+  .mobile-effects-container .add-effect-dropdown.open .add-effect-panel {
+    max-height: 50vh;
+    opacity: 1;
+    overflow-y: auto;
+  }
 }
 
 .mobile-effects-container .add-effect-dropdown.open .add-effect-header {
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  border-color: var(--accent-primary);
 }
 
 .mobile-effects-container .add-effect-item {
@@ -688,13 +696,10 @@
     -webkit-touch-callout: none;
   }
 
-  /* Ensure touch targets are at least 44px */
-  .mobile-view button,
-  .mobile-view .piano-key,
-  .mobile-view .footswitch,
-  .mobile-view .knob,
-  .mobile-view .mini-knob {
-    min-width: 44px;
+  /* Touch targets - but NOT for piano keys which need specific sizing */
+  .mobile-view .mobile-tab-btn,
+  .mobile-view .mobile-file-btn,
+  .mobile-view .footswitch {
     min-height: 44px;
   }
 
@@ -714,19 +719,21 @@
     touch-action: manipulation;
   }
 
-  /* Dropdown panels for mobile */
+  /* Dropdown panels for mobile - use fixed positioning */
   #mobile-oscillator-mixer .osc-dropdown-panel {
-    max-height: none;
-    position: fixed;
-    top: auto;
-    bottom: 60px;
-    left: 8px;
-    right: 8px;
-    z-index: 500;
+    position: fixed !important;
+    top: auto !important;
+    bottom: 70px !important;
+    left: 8px !important;
+    right: 8px !important;
+    z-index: 500 !important;
+    max-height: 0;
+    overflow: hidden;
   }
 
   #mobile-oscillator-mixer .oscillator-slot.dropdown-open .osc-dropdown-panel {
-    max-height: 50vh;
+    max-height: 45vh;
+    overflow-y: auto;
   }
 
   /* Larger day items for touch */
@@ -735,7 +742,7 @@
     min-height: 44px;
   }
 
-  /* Piano keys touch optimization */
+  /* Piano keys touch optimization - no min-width! */
   .mobile-piano-keyboard .piano-key {
     touch-action: manipulation;
   }

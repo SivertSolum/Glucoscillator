@@ -266,6 +266,13 @@ export class EffectsPanel {
       this.toggleDropdown();
     });
     
+    // Touch event for mobile
+    header?.addEventListener('touchend', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      this.toggleDropdown();
+    }, { passive: false });
+    
     this.updateDropdownList(dropdown);
     
     return dropdown;
@@ -304,6 +311,14 @@ export class EffectsPanel {
         this.closeDropdown();
       });
       
+      // Touch event for mobile
+      item.addEventListener('touchend', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        this.addEffect(effectId);
+        this.closeDropdown();
+      }, { passive: false });
+      
       list.appendChild(item);
     }
   }
@@ -321,15 +336,29 @@ export class EffectsPanel {
     this.addDropdown?.classList.add('open');
     this.updateDropdownList();
     
-    // Position the panel above the header using fixed positioning
-    const header = this.addDropdown?.querySelector('.add-effect-header') as HTMLElement;
+    // Check if we're on mobile (inside mobile-effects-container)
+    const isMobile = this.container.closest('.mobile-effects-container') !== null;
+    
     const panel = this.addDropdown?.querySelector('.add-effect-panel') as HTMLElement;
-    if (header && panel) {
-      const rect = header.getBoundingClientRect();
-      panel.style.position = 'fixed';
-      panel.style.bottom = `${window.innerHeight - rect.top}px`;
-      panel.style.left = `${rect.left}px`;
-      panel.style.width = `${rect.width}px`;
+    if (panel) {
+      if (isMobile) {
+        // On mobile, let CSS handle positioning via fixed positioning
+        // Clear any JS-set styles
+        panel.style.position = '';
+        panel.style.bottom = '';
+        panel.style.left = '';
+        panel.style.width = '';
+      } else {
+        // Desktop: Position the panel above the header using fixed positioning
+        const header = this.addDropdown?.querySelector('.add-effect-header') as HTMLElement;
+        if (header) {
+          const rect = header.getBoundingClientRect();
+          panel.style.position = 'fixed';
+          panel.style.bottom = `${window.innerHeight - rect.top}px`;
+          panel.style.left = `${rect.left}px`;
+          panel.style.width = `${rect.width}px`;
+        }
+      }
     }
   }
 
