@@ -66,22 +66,17 @@ export class EffectsPanel {
     document.addEventListener('touchmove', this.handleTouchMove, { passive: false });
     document.addEventListener('touchend', this.handleTouchEnd);
     
-    // Close dropdown when clicking/touching outside - with debounce check
+    // Close dropdown when clicking outside (desktop only - mobile uses inline expansion)
     document.addEventListener('click', (e) => {
+      // Skip on mobile - the inline expansion doesn't need auto-close
+      if (this.container.closest('.mobile-effects-container')) return;
+      
       // Debounce: ignore clicks within 300ms of toggle
       if (Date.now() - this.lastDropdownToggle < 300) return;
       if (this.addDropdown && !this.addDropdown.contains(e.target as Node) && this.isDropdownOpen) {
         this.closeDropdown();
       }
     });
-    
-    document.addEventListener('touchstart', (e) => {
-      // Debounce: ignore touches within 300ms of toggle
-      if (Date.now() - this.lastDropdownToggle < 300) return;
-      if (this.addDropdown && !this.addDropdown.contains(e.target as Node) && this.isDropdownOpen) {
-        this.closeDropdown();
-      }
-    }, { passive: true });
     
     this.render();
     this.setupEffectsCallbacks();
@@ -280,22 +275,10 @@ export class EffectsPanel {
     
     const header = dropdown.querySelector('.add-effect-header');
     
-    // Use a flag to prevent double-firing on touch devices
-    let touchHandled = false;
-    
-    header?.addEventListener('touchend', (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      touchHandled = true;
-      this.toggleDropdown();
-      // Reset flag after a short delay
-      setTimeout(() => { touchHandled = false; }, 300);
-    }, { passive: false });
-    
+    // Simple click handler - works for both mouse and touch
     header?.addEventListener('click', (e) => {
       e.stopPropagation();
-      // Skip if touch already handled this
-      if (touchHandled) return;
+      e.preventDefault();
       this.toggleDropdown();
     });
     
@@ -331,21 +314,10 @@ export class EffectsPanel {
         <span class="effect-item-name">${getEffectDisplayName(effectId)}</span>
       `;
       
-      // Use a flag to prevent double-firing on touch devices
-      let itemTouchHandled = false;
-      
-      item.addEventListener('touchend', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        itemTouchHandled = true;
-        this.addEffect(effectId);
-        this.closeDropdown();
-        setTimeout(() => { itemTouchHandled = false; }, 300);
-      }, { passive: false });
-      
+      // Simple click handler for adding effects
       item.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (itemTouchHandled) return;
+        e.preventDefault();
         this.addEffect(effectId);
         this.closeDropdown();
       });

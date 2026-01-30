@@ -284,11 +284,6 @@
   display: flex;
 }
 
-/* Effects panel needs overflow visible for dropdown */
-.mobile-tab-panel[data-tab="effects"] {
-  overflow: visible;
-}
-
 /* =====================================================
    MOBILE TAB NAVIGATION
    ===================================================== */
@@ -563,7 +558,7 @@
 }
 
 /* =====================================================
-   MOBILE EFFECTS TAB
+   MOBILE EFFECTS TAB - Redesigned for touch
    ===================================================== */
 .mobile-effects-container {
   height: 100%;
@@ -572,6 +567,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background: var(--bg-primary);
 }
 
 .mobile-effects-container .effects-rack {
@@ -580,125 +576,239 @@
   border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
-  overflow: visible;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
 }
 
-.mobile-effects-container .effects-pedalboard {
-  flex-wrap: nowrap;
-  overflow-x: scroll;
-  overflow-y: hidden;
-  padding: var(--spacing-sm);
-  gap: var(--spacing-sm);
-  -webkit-overflow-scrolling: touch;
+.mobile-effects-container .rack-header {
+  padding: var(--spacing-sm) var(--spacing-md);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(180deg, var(--metal-mid) 0%, var(--metal-dark) 100%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.mobile-effects-container .rack-screws {
+  display: none;
+}
+
+.mobile-effects-container .rack-title {
   flex: 1;
-  min-height: 0;
-  touch-action: pan-x;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
+.mobile-effects-container .rack-label {
+  font-size: 0.7rem;
+}
+
+.mobile-effects-container .rack-reset-btn {
+  padding: 6px 12px;
+  font-size: 0.6rem;
+}
+
+/* Vertical scrolling layout for effects on mobile */
+.mobile-effects-container .effects-pedalboard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+/* Effect modules as horizontal cards */
 .mobile-effects-container .effect-module {
-  width: 100px;
+  width: 100%;
   flex-shrink: 0;
 }
 
 .mobile-effects-container .module-faceplate {
-  padding: var(--spacing-xs);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  min-height: 60px;
+}
+
+.mobile-effects-container .module-screws {
+  display: none;
+}
+
+.mobile-effects-container .module-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-width: 80px;
 }
 
 .mobile-effects-container .module-icon {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
 }
 
 .mobile-effects-container .module-name {
-  font-size: 0.5rem;
-}
-
-.mobile-effects-container .mini-knob {
-  width: 22px;
-  height: 22px;
-}
-
-.mobile-effects-container .mini-knob-container {
-  width: 26px;
-  height: 26px;
-}
-
-.mobile-effects-container .mini-knob-label {
-  font-size: 0.45rem;
-}
-
-.mobile-effects-container .footswitch {
-  width: 26px;
-  height: 26px;
-}
-
-.mobile-effects-container .rack-header {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  flex-shrink: 0;
-}
-
-.mobile-effects-container .rack-label {
   font-size: 0.65rem;
 }
 
-/* Mobile effects dropdown - positioned above the button */
+.mobile-effects-container .module-knobs {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.mobile-effects-container .knob-row {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.mobile-effects-container .mini-knob-wrapper {
+  gap: 1px;
+}
+
+.mobile-effects-container .mini-knob {
+  width: 28px;
+  height: 28px;
+}
+
+.mobile-effects-container .mini-knob-container {
+  width: 32px;
+  height: 32px;
+}
+
+.mobile-effects-container .mini-knob-label {
+  font-size: 0.5rem;
+}
+
+.mobile-effects-container .module-footer {
+  flex-direction: row;
+  gap: var(--spacing-sm);
+  padding: 0;
+}
+
+.mobile-effects-container .module-label {
+  display: none;
+}
+
+.mobile-effects-container .footswitch {
+  width: 36px;
+  height: 36px;
+}
+
+.mobile-effects-container .module-remove-btn {
+  opacity: 1;
+  position: static;
+  width: 28px;
+  height: 28px;
+  font-size: 1.2rem;
+}
+
+/* No effects message */
+.mobile-effects-container .no-effects-message {
+  padding: var(--spacing-lg);
+  text-align: center;
+}
+
+/* Add effect section - inline expandable */
 .mobile-effects-container .add-effect-dropdown {
-  margin-top: var(--spacing-xs);
+  margin: 0;
   flex-shrink: 0;
-  position: relative;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: linear-gradient(180deg, var(--metal-mid) 0%, var(--metal-dark) 100%);
 }
 
 .mobile-effects-container .add-effect-header {
   padding: var(--spacing-sm) var(--spacing-md);
-  min-height: 44px;
+  min-height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--spacing-sm);
+  border: none;
+  background: transparent;
+}
+
+.mobile-effects-container .add-effect-header:active {
+  background: rgba(232, 168, 124, 0.1);
 }
 
 .mobile-effects-container .add-effect-label {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
+  color: var(--accent-primary);
 }
 
-/* Mobile effects panel - position above the header */
+.mobile-effects-container .dropdown-arrow {
+  color: var(--accent-primary);
+}
+
+/* Panel slides down from header - inline expansion */
 .mobile-effects-container .add-effect-panel {
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  right: 0;
-  margin-bottom: 4px;
+  position: relative;
   max-height: 0;
   overflow: hidden;
-  opacity: 0;
-  background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
-  border: 2px solid var(--accent-primary);
-  border-radius: var(--radius-md);
-  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.5);
-  z-index: 100;
-  transition: max-height 0.3s ease, opacity 0.3s ease;
+  background: var(--bg-secondary);
+  transition: max-height 0.3s ease;
 }
 
 .mobile-effects-container .add-effect-dropdown.open .add-effect-panel {
-  max-height: 200px;
-  opacity: 1;
+  max-height: 300px;
   overflow-y: auto;
 }
 
 .mobile-effects-container .add-effect-dropdown.open .add-effect-header {
-  border-color: var(--accent-primary);
   background: rgba(232, 168, 124, 0.1);
 }
 
+.mobile-effects-container .add-effect-dropdown.open .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.mobile-effects-container .add-effect-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
+}
+
 .mobile-effects-container .add-effect-item {
-  padding: var(--spacing-sm) var(--spacing-md);
-  min-height: 48px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--spacing-sm);
+  justify-content: center;
+  gap: 4px;
+  padding: var(--spacing-sm);
+  min-height: 60px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
 }
 
 .mobile-effects-container .add-effect-item:active {
   background: rgba(232, 168, 124, 0.2);
+  border-color: var(--accent-primary);
+}
+
+.mobile-effects-container .effect-item-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.mobile-effects-container .effect-item-name {
+  font-size: 0.6rem;
+  text-align: center;
+}
+
+.mobile-effects-container .no-effects-available {
+  grid-column: span 2;
+  padding: var(--spacing-md);
 }
 
 /* =====================================================
