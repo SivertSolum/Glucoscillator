@@ -273,12 +273,27 @@ export class EffectsPanel {
       </div>
     `;
     
-    const header = dropdown.querySelector('.add-effect-header');
+    const header = dropdown.querySelector('.add-effect-header') as HTMLElement;
     
-    // Simple click handler - works for both mouse and touch
+    // Track if we should handle the click (to prevent double-firing on touch devices)
+    let touchHandled = false;
+    
+    // Touch handler for mobile - more reliable than click on touch devices
+    header?.addEventListener('touchend', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      touchHandled = true;
+      this.toggleDropdown();
+      // Reset after a short delay
+      setTimeout(() => { touchHandled = false; }, 300);
+    }, { passive: false });
+    
+    // Click handler for desktop (and fallback)
     header?.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
+      // Skip if touch already handled this interaction
+      if (touchHandled) return;
       this.toggleDropdown();
     });
     
@@ -314,10 +329,24 @@ export class EffectsPanel {
         <span class="effect-item-name">${getEffectDisplayName(effectId)}</span>
       `;
       
-      // Simple click handler for adding effects
+      // Track touch handling to prevent double-firing
+      let touchHandled = false;
+      
+      // Touch handler for mobile
+      item.addEventListener('touchend', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        touchHandled = true;
+        this.addEffect(effectId);
+        this.closeDropdown();
+        setTimeout(() => { touchHandled = false; }, 300);
+      }, { passive: false });
+      
+      // Click handler for desktop (and fallback)
       item.addEventListener('click', (e) => {
         e.stopPropagation();
         e.preventDefault();
+        if (touchHandled) return;
         this.addEffect(effectId);
         this.closeDropdown();
       });
