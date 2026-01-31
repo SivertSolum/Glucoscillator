@@ -347,6 +347,14 @@
   overflow: hidden;
 }
 
+/* =====================================================
+   MOBILE EFFECTS TAB - prevent outer scroll
+   ===================================================== */
+.mobile-tab-panel[data-tab="effects"] {
+  padding: 0;
+  overflow: hidden; /* Inner effects-pedalboard handles scrolling */
+}
+
 .mobile-piano-keyboard {
   display: flex;
   align-items: flex-end;
@@ -612,6 +620,7 @@
 /* Vertical scrolling layout for effects on mobile */
 .mobile-effects-container .effects-pedalboard {
   flex: 1;
+  min-height: 0; /* Essential for flex children to enable scrolling */
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
@@ -620,6 +629,7 @@
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
+  overscroll-behavior: contain; /* Prevent scroll chaining to parent */
 }
 
 /* Effect modules as horizontal cards */
@@ -754,12 +764,21 @@
   max-height: 0;
   overflow: hidden;
   background: var(--bg-secondary);
-  transition: max-height 0.3s ease;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+  /* Reset desktop absolute positioning */
+  bottom: auto;
+  left: auto;
+  right: auto;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .mobile-effects-container .add-effect-dropdown.open .add-effect-panel {
   max-height: 300px;
   overflow-y: auto;
+  opacity: 1;
 }
 
 .mobile-effects-container .add-effect-dropdown.open .add-effect-header {
@@ -831,7 +850,7 @@
 
   /* Smooth scrolling for effects pedalboard */
   .mobile-effects-container .effects-pedalboard {
-    scroll-snap-type: x proximity;
+    scroll-snap-type: y proximity;
     scroll-behavior: smooth;
   }
 
