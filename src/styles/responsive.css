@@ -353,7 +353,10 @@
 .mobile-tab-panel[data-tab="effects"] {
   padding: 0;
   overflow: hidden; /* Prevent outer scroll, inner pedalboard handles it */
-  /* Ensure flex container allows children to determine own scroll */
+}
+
+/* When effects tab is active, use column flex layout */
+.mobile-tab-panel[data-tab="effects"].active {
   display: flex;
   flex-direction: column;
 }
@@ -589,7 +592,7 @@
   border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
-  overflow: visible; /* Allow child pedalboard to handle scrolling */
+  overflow: hidden; /* Contain content within rack, pedalboard scrolls internally */
   background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
 }
 
