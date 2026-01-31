@@ -184,46 +184,6 @@
     left: 100vw;
     left: 100dvw;
   }
-  
-  /* Fix heights for rotated view - use vw for height since it's rotated */
-  .mobile-tab-content {
-    /* After rotation, the "height" of the content area is based on original viewport width */
-    height: calc(100vw - 100px); /* Subtract header (44px) + tab nav (56px) */
-    flex: none; /* Don't use flex sizing, use explicit height */
-  }
-  
-  .mobile-tab-panel {
-    /* Use explicit height instead of inset for rotated view */
-    height: 100%;
-    max-height: 100%;
-  }
-  
-  /* Effects panel needs explicit height in rotated mode */
-  .mobile-effects-container {
-    height: 100%;
-    max-height: 100%;
-  }
-  
-  .mobile-effects-container.effects-rack {
-    height: 100%;
-    max-height: 100%;
-    overflow: hidden;
-  }
-  
-  .mobile-effects-container .effects-pedalboard {
-    /* Explicit height calculation for scroll in rotated mode */
-    flex: 1;
-    min-height: 0;
-    max-height: none; /* Let flex handle it */
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  /* Ensure add dropdown doesn't get cut off */
-  .mobile-effects-container .add-effect-dropdown {
-    flex-shrink: 0;
-    min-height: 52px;
-  }
 }
 
 /* =====================================================
@@ -302,26 +262,25 @@
    ===================================================== */
 .mobile-tab-content {
   flex: 1;
-  position: relative;
-  overflow: hidden;
-  min-height: 0;
+  min-height: 0; /* Critical for flex children to scroll */
   width: 100%;
   max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .mobile-tab-panel {
-  position: absolute;
-  inset: 0;
+  /* Use flex instead of absolute positioning for better rotation support */
   display: none;
   flex-direction: column;
+  flex: 1;
+  min-height: 0; /* Critical for nested flex children to scroll */
   overflow: hidden;
-  overflow-y: auto;
   padding: var(--spacing-xs);
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  /* Ensure panel doesn't extend beyond its container */
-  max-height: 100%;
 }
 
 .mobile-tab-panel.active {
@@ -391,7 +350,11 @@
    ===================================================== */
 .mobile-tab-panel[data-tab="keyboard"] {
   padding: 0;
-  overflow: hidden;
+}
+
+.mobile-tab-panel[data-tab="keyboard"].active {
+  display: flex;
+  flex-direction: column;
 }
 
 /* =====================================================
@@ -400,17 +363,12 @@
 .mobile-tab-panel[data-tab="effects"] {
   padding: 0;
   overflow: hidden; /* Prevent outer scroll, inner pedalboard handles it */
-  /* Ensure the panel doesn't extend under the tab bar */
-  box-sizing: border-box;
 }
 
 /* When effects tab is active, use column flex layout */
 .mobile-tab-panel[data-tab="effects"].active {
   display: flex;
   flex-direction: column;
-  /* Explicit height to ensure proper containment */
-  height: 100%;
-  max-height: 100%;
 }
 
 .mobile-piano-keyboard {
@@ -418,7 +376,8 @@
   align-items: flex-end;
   justify-content: flex-start;
   gap: 0; /* Explicitly no gap */
-  height: 100%;
+  flex: 1; /* Fill available height */
+  min-height: 0;
   width: 100%;
   max-width: 100%;
   background: linear-gradient(180deg, #1a1815 0%, #0f0d0b 100%);
@@ -478,13 +437,15 @@
 .mobile-oscillators-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
+  min-height: 0; /* Critical for flex scroll */
   width: 100%;
   max-width: 100%;
   gap: var(--spacing-sm);
   overflow-y: auto;
   overflow-x: hidden;
   box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
 }
 
 #mobile-oscillator-mixer {
@@ -627,7 +588,8 @@
    MOBILE EFFECTS TAB - Redesigned for touch
    ===================================================== */
 .mobile-effects-container {
-  height: 100%;
+  flex: 1;
+  min-height: 0; /* Critical for flex children to scroll */
   width: 100%;
   max-width: 100%;
   display: flex;
@@ -641,7 +603,7 @@
 /* When mobile-effects-container also has effects-rack class (same element) */
 .mobile-effects-container.effects-rack {
   flex: 1;
-  min-height: 0;
+  min-height: 0; /* Critical for nested flex children to scroll */
   border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
@@ -684,19 +646,17 @@
 /* Vertical scrolling layout for effects on mobile */
 .mobile-effects-container .effects-pedalboard {
   flex: 1;
-  min-height: 0; /* Essential for flex children to enable scrolling */
+  min-height: 0; /* Critical - allows flex item to shrink and enable scrolling */
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm);
-  padding-bottom: 80px; /* Large padding at bottom for last item visibility above add button */
-  overflow-y: scroll; /* Force scrollbar - auto may not work on some mobile browsers */
+  padding-bottom: 20px; /* Padding at bottom for last item visibility */
+  overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  touch-action: pan-y pinch-zoom; /* Allow vertical scroll and zoom */
+  touch-action: pan-y; /* Allow vertical scroll */
   overscroll-behavior: contain; /* Prevent scroll chaining to parent */
-  /* Ensure scrollability on mobile */
-  position: relative;
 }
 
 /* Effect modules as horizontal cards */
