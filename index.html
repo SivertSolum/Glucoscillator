@@ -31,9 +31,21 @@
           <div class="midi-selector">
             <span class="midi-icon">🎹</span>
             <select id="midi-device-select" disabled>
-              <option value="">No MIDI devices</option>
+              <option value="">Start audio to use MIDI</option>
             </select>
             <span id="midi-status-indicator" class="midi-status-indicator"></span>
+            <button
+              type="button"
+              id="midi-info-btn"
+              class="midi-info-btn"
+              aria-label="About MIDI browser access"
+            >
+              <span class="midi-info-icon">?</span>
+              <span class="midi-info-tooltip" role="tooltip">
+                Physical MIDI keyboards need a one-time browser permission to connect.
+                Firefox may ask you to install an add-on; Chrome and Edge will show a simple Allow prompt.
+              </span>
+            </button>
           </div>
         </div>
       </header>

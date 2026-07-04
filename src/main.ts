@@ -381,13 +381,9 @@ function setupStartButton(): void {
       
       // Start keyboard input
       getKeyboardHandler().start();
-      
-      // Start MIDI
-      if (MIDIHandler.isSupported()) {
-        await getMIDIHandler().start();
-      }
 
       isAudioStarted = true;
+      enableMidiSelector();
       
       // Hide the overlay (not just the button)
       startOverlay.classList.add('hidden');
@@ -403,16 +399,87 @@ function setupStartButton(): void {
 }
 
 /**
+ * Enable the MIDI selector after audio has started
+ */
+function enableMidiSelector(): void {
+  const select = document.getElementById('midi-device-select') as HTMLSelectElement;
+  if (!select || !MIDIHandler.isSupported()) return;
+
+  if (getMIDIHandler().hasAccess()) {
+    updateMIDIDeviceList(getMIDIHandler().getAvailableDevices());
+    return;
+  }
+
+  select.disabled = false;
+  select.innerHTML = '<option value="">Connect MIDI keyboard…</option>';
+}
+
+/**
+ * Request MIDI access on first user interaction with the device selector
+ */
+async function ensureMidiAccess(): Promise<boolean> {
+  const select = document.getElementById('midi-device-select') as HTMLSelectElement;
+  if (!select) return false;
+
+  select.disabled = true;
+  select.innerHTML = '<option value="">Requesting access…</option>';
+
+  const granted = await getMIDIHandler().ensureAccess();
+
+  if (!granted) {
+    select.disabled = false;
+    select.innerHTML = '<option value="">Connect MIDI keyboard…</option>';
+    showError('MIDI access denied. You can still play with mouse, touch, or keyboard.');
+    return false;
+  }
+
+  return true;
+}
+
+/**
  * Set up MIDI device selector dropdown
  */
 function setupMIDIDeviceSelector(): void {
   const select = document.getElementById('midi-device-select') as HTMLSelectElement;
   if (!select) return;
 
+  select.addEventListener('mousedown', async (e) => {
+    if (!isAudioStarted || getMIDIHandler().hasAccess()) return;
+
+    e.preventDefault();
+    const granted = await ensureMidiAccess();
+    if (granted) {
+      select.showPicker?.();
+    }
+  });
+
+  select.addEventListener('keydown', async (e) => {
+    if (!isAudioStarted || getMIDIHandler().hasAccess()) return;
+    if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'ArrowDown') return;
+
+    e.preventDefault();
+    const granted = await ensureMidiAccess();
+    if (granted) {
+      select.showPicker?.();
+    }
+  });
+
   select.addEventListener('change', () => {
     const midiHandler = getMIDIHandler();
     const deviceId = select.value || null;
     midiHandler.selectDevice(deviceId);
+  });
+
+  const infoBtn = document.getElementById('midi-info-btn');
+  infoBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    infoBtn.classList.toggle('tooltip-visible');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!infoBtn?.contains(e.target as Node)) {
+      infoBtn?.classList.remove('tooltip-visible');
+    }
   });
 }
 

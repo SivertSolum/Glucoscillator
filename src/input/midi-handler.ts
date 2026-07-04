@@ -45,6 +45,28 @@ export class MIDIHandler {
   }
 
   /**
+   * Whether MIDI access has already been granted
+   */
+  hasAccess(): boolean {
+    return this.midiAccess !== null;
+  }
+
+  private accessPromise: Promise<boolean> | null = null;
+
+  /**
+   * Request MIDI access once (dedupes concurrent calls)
+   */
+  async ensureAccess(): Promise<boolean> {
+    if (this.midiAccess) return true;
+    if (this.accessPromise) return this.accessPromise;
+
+    this.accessPromise = this.start().finally(() => {
+      this.accessPromise = null;
+    });
+    return this.accessPromise;
+  }
+
+  /**
    * Request MIDI access and start listening
    */
   async start(): Promise<boolean> {
