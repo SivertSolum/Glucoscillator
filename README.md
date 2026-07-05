@@ -86,13 +86,19 @@ Open http://localhost:5173 in your browser.
 
 ---
 
+## 🌐 Live demo
+
+[https://glukoscillator.vercel.app/](https://glukoscillator.vercel.app/)
+
 ## 📦 Scripts
 
 ```bash
 npm run dev      # Start development server (hot reload)
-npm run build    # Build for production (TypeScript + Vite)
+npm run build    # Build for production (TypeScript + Vite) → dist/
 npm run preview  # Preview production build locally
 ```
+
+Production deploys to Vercel from the connected repository branch.
 
 ---
 

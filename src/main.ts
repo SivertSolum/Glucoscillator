@@ -193,7 +193,7 @@ function setupMobileFileLoader(): void {
  */
 async function loadSampleData(): Promise<void> {
   try {
-    // Use import.meta.env.BASE_URL for correct path on GitHub Pages
+    // import.meta.env.BASE_URL resolves public asset paths in dev and production (Vercel)
     const response = await fetch(`${import.meta.env.BASE_URL}sample-data/sample-glucose.csv`);
     if (!response.ok) {
       console.warn('Sample data not found');

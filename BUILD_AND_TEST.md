@@ -34,6 +34,10 @@ npm run preview
 
 Preview the production build locally.
 
+## Deploy
+
+Production: [https://glukoscillator.vercel.app/](https://glukoscillator.vercel.app/) — Vercel builds `npm run build` and serves `dist/` on push to the connected branch.
+
 ## Test
 
 No automated tests. Load a sample LibreView CSV in the browser and verify audio output manually.
